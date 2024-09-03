@@ -3,10 +3,11 @@
 // @namespace    https://github.com/Awakcn/Audio-Reverser-for-Bilibili-Live-Streams
 // @updateURL    https://github.com/Audio-Reverser-for-Bilibili-Live-Streams/blob/main/AudioReverser.user.js
 // @downloadURL  https://github.com/Audio-Reverser-for-Bilibili-Live-Streams/blob/main/AudioReverser.user.js
-// @version      1.1
+// @version      1.2
 // @description  reverse the left and right audio channels for Bilibili live streams B站直播音频声道反转
 // @author       Awakcn
 // @match        https://live.bilibili.com/blanc/5609440*
+// @match        https://live.bilibili.com/5609440*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=bilibili.com
 // @grant        none
 // ==/UserScript==
@@ -48,6 +49,40 @@
     }
 
     function addButton() {
+        const container = document.querySelector("#control-panel-ctnr-box > div.control-panel-icon-row.f-clear.p-relative.superChat")
+        if (!container) {
+            console.error("Control panel container not found.");
+            return;
+        }
+
+        const button = document.createElement('button');
+        button.textContent = '翻';
+        button.style.padding = '2.5px';
+        button.style.backgroundColor = 'transparent';
+        button.style.color = '#D3D3D3';
+        button.style.border = '1.5px solid #D3D3D3';
+        button.style.borderRadius = '5px';
+        button.style.cursor = 'pointer';
+        button.style.zIndex = '9999';
+        button.style.fontWeight = 'bold';
+        button.style.marginLeft = '33px'
+        button.style.marginTop = '0px'
+
+
+        button.addEventListener('click', () => {
+            const videoElement = document.querySelector("#live-player > video");
+            if (videoElement) {
+                reverseAudioChannels(videoElement);
+                alert('Audio channels reversed.');
+            } else {
+                alert('Video element not found.');
+            }
+        });
+
+        container.appendChild(button);
+    }
+
+        function addButtonBlanc() {
         const container = document.querySelector("#head-info-vm > div > div.rows-ctnr.rows-content > div.upper-row > div.left-ctnr.left-header-area");
         if (!container) {
             console.error("Control panel container not found.");
@@ -82,9 +117,15 @@
     }
 
     window.addEventListener('load', function() {
-        setTimeout(monitorVideoElement, 2000); // 视频延迟检测
-        setTimeout(addButton, 3000); // 加按钮
+        const url = window.location.href;
+
+        if (url.includes("blanc")) {
+            setTimeout(monitorVideoElement, 2000); // 视频延迟检测
+            setTimeout(addButtonBlanc, 3000); // 加按钮
+        } else {
+            setTimeout(monitorVideoElement, 2000); // 视频延迟检测
+            setTimeout(addButton, 3000); // 加不同的按钮
+        }
     });
 
 })();
-
